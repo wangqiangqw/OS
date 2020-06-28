@@ -1,17 +1,40 @@
-ipl.bin: ipl.asm Makefile
-		../tolset/z_tools/nask.exe ipl.asm ipl.bin ipl.lst
+TOOLPATH = ../tolset/z_tools/
+MAKE     = $(TOOLPATH)make.exe -r
+NASK     = $(TOOLPATH)nask.exe
+EDIMG    = $(TOOLPATH)edimg.exe
+IMGTOL   = $(TOOLPATH)imgtol.com
+COPY     = copy
+DEL      = del
 
-helloos.img : ipl.bin Makefile
-	../tolset/z_tools/edimg.exe   imgin:../tolset/z_tools/fdimg0at.tek \
-		wbinimg src:ipl.bin len:512 from:0 to:0   imgout:helloos.img
+ipl10.bin: ipl10.asm Makefile
+		$(NASK) ipl10.asm ipl10.bin ipl10.lst
+
+haribote.sys: haribote.asm Makefile
+		$(NASK) haribote.asm haribote.sys haribote.lst
+
+haribote.img : ipl10.bin haribote.sys Makefile
+	$(EDIMG)   imgin:../tolset/z_tools/fdimg0at.tek \
+		wbinimg src:ipl10.bin len:512 from:0 to:0   \
+		copy from:haribote.sys to:@: \
+		imgout:haribote.img
 
 asm :
-	../tolset/z_tools/make.exe -r ipl.bin
+	$(MAKE) ipl10.bin
 
 img:
-	../tolset/z_tools/make.exe -r helloos.img...
+	$(MAKE) haribote.img
 
 run :
-	../tolset/z_tools/make.exe img
-	copy helloos.img ..\tolset\z_tools\qemu\fdimage0.bin
-	../tolset/z_tools/make.exe -C ../tolset/z_tools/qemu
+	$(MAKE) img
+	copy haribote.img ..\tolset\z_tools\qemu\fdimage0.bin
+	$(MAKE) -C ../tolset/z_tools/qemu
+
+clean :
+	-$(DEL) ipl10.bin
+	-$(DEL) ipl10.lst
+	-$(DEL) haribote.sys
+	-$(DEL) haribote.lst
+
+src_only :
+	$(MAKE) clean
+	-$(DEL) haribote.img

@@ -32,6 +32,7 @@
 
 ;-----------------------END -- 清屏------------------
 
+
 entry:
         MOV     AX, 0
         MOV     SS, AX
@@ -113,7 +114,10 @@ next:
  success:                                       ;successful
         MOV     SI, succmsg
         JMP     putloop
+
 fin:
+ 	MOV	[0x0ff0],CH		; IPL���ǂ��܂œǂ񂾂̂�������
+	JMP	0xc200
         HLT
         JMP     fin
 

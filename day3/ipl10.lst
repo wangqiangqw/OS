@@ -116,12 +116,12 @@
    114 00007CEC                                  success:                                       ;successful
    115 00007CEC BE 7D3F                                 MOV     SI, succmsg
    116 00007CEF EB 0D                                   JMP     putloop
-   117 00007CF1 88 2E 0FF0                      	MOV	[0x0ff0],CH		; IPL���ǂ��܂œǂ񂾂̂�������
-   118 00007CF5 E9 4508                         	JMP	0xc200
-   119 00007CF8                                 
-   120 00007CF8                                 fin:
+   117 00007CF1                                 
+   118 00007CF1                                 fin:
+   119 00007CF1 88 2E 0FF0                       	MOV	[0x0ff0],CH		; IPL���ǂ��܂œǂ񂾂̂�������
+   120 00007CF5 E9 4508                         	JMP	0xc200
    121 00007CF8 F4                                      HLT
-   122 00007CF9 EB FD                                   JMP     fin
+   122 00007CF9 EB F6                                   JMP     fin
    123 00007CFB                                 
    124 00007CFB                                 error:
    125 00007CFB BE 7D10                                 MOV     SI, errormsg
@@ -130,7 +130,7 @@
    128 00007D00 83 C6 01                                ADD     SI,1
    129 00007D03 3C 00                                   CMP     AL,0
    130 00007D05                                 
-   131 00007D05 74 F1                                   JE      fin
+   131 00007D05 74 EA                                   JE      fin
    132 00007D07 B4 0E                                   MOV     AH,0X0E                 ;显示一个文字
    133 00007D09 BB 000F                                 MOV     BX,15                   ;指定字符颜色
    134 00007D0C CD 10                                   INT     0X10                    ;调用显卡BIOS
