@@ -1,5 +1,8 @@
 ;hello-os
 ;TAB=4
+
+CYLS EQU 9
+
     ORG 0x7c00
 
     JMP entry
