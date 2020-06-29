@@ -94,18 +94,12 @@ next:
         CMP     CL,18                   ;只到扇区18
         JBE     readloop
 ;------------读 磁头2 -----------------------------------------
-        MOV     AX,ES
-        ADD     AX,0X0020
-        MOV     ES,AX
         MOV     CL, 1                   ;重新回到扇区1
         ADD     DH, 1                   ;磁头加1
 
         CMP     DH, 1
         JBE     readloop
 ;------------读到柱面 10 ---------------------------------------
-        MOV     AX,ES
-        ADD     AX,0X0020
-        MOV     ES,AX
         MOV     CL, 1                   ;重新回到扇区1
         MOV     DH, 0                   ;磁头加1
         ADD     CH, 1
