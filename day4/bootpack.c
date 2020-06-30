@@ -3,13 +3,42 @@ void write_mem8(int addr, int data);
 void HariMain(void)
 {
     int i;
-    for(i=0xa0000;i<=0xaffff;i++)
+    char *p=(char*)0xa0000;
+    for(i=0x0000;i<=0xffff;i++)
     {
-        write_mem8(i,15);
+        
+        p[i]=i&0xf;
+        //write_mem8(i,i&15);
     }
     for(;;)
     {
         io_hlt();
     }   
-       
+}
+
+
+void init_palette(void)
+{
+	static unsigned char table_rgb[16 * 3] = {
+		0x00, 0x00, 0x00,	/*  0:�� */
+		0xff, 0x00, 0x00,	/*  1:���邢�� */
+		0x00, 0xff, 0x00,	/*  2:���邢�� */
+		0xff, 0xff, 0x00,	/*  3:���邢���F */
+		0x00, 0x00, 0xff,	/*  4:���邢�� */
+		0xff, 0x00, 0xff,	/*  5:���邢�� */
+		0x00, 0xff, 0xff,	/*  6:���邢���F */
+		0xff, 0xff, 0xff,	/*  7:�� */
+		0xc6, 0xc6, 0xc6,	/*  8:���邢�D�F */
+		0x84, 0x00, 0x00,	/*  9:�Â��� */
+		0x00, 0x84, 0x00,	/* 10:�Â��� */
+		0x84, 0x84, 0x00,	/* 11:�Â����F */
+		0x00, 0x00, 0x84,	/* 12:�Â��� */
+		0x84, 0x00, 0x84,	/* 13:�Â��� */
+		0x00, 0x84, 0x84,	/* 14:�Â����F */
+		0x84, 0x84, 0x84	/* 15:�Â��D�F */
+	};
+	set_palette(0, 15, table_rgb);
+	return;
+
+	/* static char ���߂́A�f�[�^�ɂ����g���Ȃ�����DB���ߑ��� */
 }
