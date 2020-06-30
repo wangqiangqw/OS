@@ -61,10 +61,15 @@ run :
 	$(MAKE) -C ../tolset/z_tools/qemu
 
 clean :
-	-$(DEL) ipl10.bin
-	-$(DEL) ipl10.lst
+	-$(DEL) *.bin
+	-$(DEL) *.lst
+	-$(DEL) *.gas
+	-$(DEL) *.obj
+	-$(DEL) bootpack.nas
+	-$(DEL) bootpack.map
+	-$(DEL) bootpack.bim
+	-$(DEL) bootpack.hrb
 	-$(DEL) haribote.sys
-	-$(DEL) haribote.lst
 
 src_only :
 	$(MAKE) clean
