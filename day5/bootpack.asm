@@ -4,7 +4,7 @@
 [OPTION 1]
 [BITS 32]
 	EXTERN	_load_gdtr
-	EXTERN	_load_ldtr
+	EXTERN	_load_idtr
 	EXTERN	_sprintf
 	EXTERN	_io_hlt
 	EXTERN	_io_load_eflags
@@ -62,7 +62,7 @@ L11:
 	JNS	L11
 	PUSH	2553856
 	PUSH	2047
-	CALL	_load_ldtr
+	CALL	_load_idtr
 	LEA	ESP,DWORD [-8+EBP]
 	POP	EBX
 	POP	ESI
