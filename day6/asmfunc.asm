@@ -2,8 +2,8 @@
 ;TAB = 4
 
 [FORMAT "WCOFF"]
-[BITS 32]
 [INSTRSET "i486p"]
+[BITS 32]
 [FILE "asmfunc.asm"]
 
     GLOBAL  _io_hlt, _io_cli, _io_sti, _io_stihlt
@@ -12,10 +12,11 @@
     GLOBAL  _io_load_eflags, _io_store_eflags
     GLOBAL  _load_gdtr, _load_idtr
     GLOBAL  _write_mem8
-    GLOBAL  _asm_inthandler21,_asm_inthandler23
+    GLOBAL  _asm_inthandler21,_asm_inthandler2c
+    EXTERN  _inthandler21,  _inthandler2c
 
 [SECTION .text]
-EXTERN  _inthandler21,  _inthandler2c
+
 
 
 _write_mem8:    ; void write_mem8(int addr, int data);

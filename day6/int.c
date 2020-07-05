@@ -26,8 +26,8 @@ void init_pic(void)
 void inthandler21(int *esp)
 {
 	struct BOOTINFO *binfo  = (struct BOOTINFO *) ADR_BOOTINFO;
-	boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32*8-15,15);
-	putfont8_asc(binfo->vram,binfo->scrnx,0,0,COL8_FFFFFF,"INT 21 (IRO-1) : PS/2 KEYBOARD");
+	boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32*8-1,15);
+	putfont8_asc(binfo->vram,binfo->scrnx,0,0,COL8_FFFFFF,"INT 21 (IRQ-1) : PS/2 KEYBOARD");
 	for(;;)
 		io_hlt();
 }
@@ -35,8 +35,8 @@ void inthandler21(int *esp)
 void inthandler2c(int *esp)
 {
 	struct BOOTINFO *binfo  = (struct BOOTINFO *) ADR_BOOTINFO;
-	boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32*8-15,15);
-	putfont8_asc(binfo->vram,binfo->scrnx,0,0,COL8_FFFFFF,"INT 2c (IRO-12) : PS/2 MOUSE");
+	boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32*8-1,15);
+	putfont8_asc(binfo->vram,binfo->scrnx,0,0,COL8_FFFFFF,"INT 2c (IRQ-12) : PS/2 MOUSE");
 	for(;;)
 		io_hlt();
 }

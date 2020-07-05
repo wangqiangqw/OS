@@ -103,11 +103,14 @@ void putfont8(char *vram, int xsize,int x,int y, char c, char *font)
 void putfont8_asc(char *vram, int xsize,int x,int y, char c, unsigned char *s)
 {
 	extern char hankaku[4096];
+	static int i = 0;
+	i++;
 	for(;*s!=0x00;s++)
 	{
 		putfont8(vram,xsize,x,y,c,hankaku +*s*16);
 		x+=8;
 	}
+	putfont8(vram,xsize,x,y+i*16,c,hankaku +i*16);
 
 	return;
 }
