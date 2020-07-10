@@ -3,6 +3,13 @@
 
 extern struct FIFO8 keyfifo;
 
+#define PORT_KEYDAT				0X0060
+#define PORT_KEYSTA				0X0064
+#define PORT_KEYCMD				0X0064
+#define KEYSTA_SEND_NOTREADY	0X02
+#define	KEYCMD_WRITE_MODE		0X60
+#define KBC_MODE				0X47
+
 void HariMain(void)
 {
 
@@ -45,7 +52,7 @@ void HariMain(void)
 			sprintf(s,"%02X",i);
 			boxfill8(binfo->vram,binfo->scrnx,COL8_008484,mx+m*16,my+n*16,15,31);
 			putfont8_asc(binfo->vram,binfo->scrnx,mx+m*16,my+n*16,COL8_FFFFFF,s);
-			if(m==10)
+			if(m==16)
 			{
 				m=0;
 				n++;
