@@ -6,20 +6,21 @@
 	EXTERN	_init_gdtidt
 	EXTERN	_init_pic
 	EXTERN	_io_sti
+	EXTERN	_keyfifo
+	EXTERN	_fifo8_init
+	EXTERN	_io_out8
 	EXTERN	_init_palette
 	EXTERN	_init_screen
 	EXTERN	_init_mouse_cursor8
 	EXTERN	_putblock8_8
 	EXTERN	_sprintf
 	EXTERN	_putfont8_asc
-	EXTERN	_io_out8
-	EXTERN	_keyfifo
-	EXTERN	_fifo8_init
 	EXTERN	_io_cli
 	EXTERN	_fifo8_status
 	EXTERN	_fifo8_get
 	EXTERN	_boxfill8
 	EXTERN	_io_stihlt
+	EXTERN	_io_in8
 [FILE "bootpack.c"]
 [SECTION .data]
 LC0:
@@ -39,6 +40,18 @@ _HariMain:
 	CALL	_init_gdtidt
 	CALL	_init_pic
 	CALL	_io_sti
+	LEA	EAX,DWORD [-348+EBP]
+	PUSH	EAX
+	PUSH	32
+	PUSH	_keyfifo
+	CALL	_fifo8_init
+	PUSH	249
+	PUSH	33
+	CALL	_io_out8
+	PUSH	239
+	PUSH	161
+	CALL	_io_out8
+	CALL	_init_keyboard
 	CALL	_init_palette
 	MOVSX	EAX,WORD [4086]
 	PUSH	EAX
@@ -46,8 +59,9 @@ _HariMain:
 	PUSH	EAX
 	PUSH	DWORD [4088]
 	CALL	_init_screen
-	MOV	ECX,2
+	ADD	ESP,40
 	MOVSX	EAX,WORD [4084]
+	MOV	ECX,2
 	LEA	EDX,DWORD [-16+EAX]
 	MOV	EAX,EDX
 	CDQ
@@ -73,7 +87,7 @@ _HariMain:
 	PUSH	EAX
 	PUSH	DWORD [4088]
 	CALL	_putblock8_8
-	ADD	ESP,52
+	ADD	ESP,40
 	PUSH	ESI
 	PUSH	EDI
 	MOV	EDI,16
@@ -89,18 +103,7 @@ _HariMain:
 	PUSH	DWORD [4088]
 	CALL	_putfont8_asc
 	ADD	ESP,40
-	PUSH	249
-	PUSH	33
-	CALL	_io_out8
-	PUSH	239
-	PUSH	161
-	CALL	_io_out8
-	LEA	EAX,DWORD [-348+EBP]
-	PUSH	EAX
-	PUSH	32
-	PUSH	_keyfifo
-	CALL	_fifo8_init
-	ADD	ESP,28
+	CALL	_enable_mouse
 L2:
 	CALL	_io_cli
 	PUSH	_keyfifo
@@ -151,3 +154,43 @@ L9:
 L8:
 	CALL	_io_stihlt
 	JMP	L2
+	GLOBAL	_wait_KBC_sendready
+_wait_KBC_sendready:
+	PUSH	EBP
+	MOV	EBP,ESP
+L11:
+	PUSH	100
+	CALL	_io_in8
+	POP	ECX
+	AND	EAX,2
+	JNE	L11
+	LEAVE
+	RET
+	GLOBAL	_init_keyboard
+_init_keyboard:
+	PUSH	EBP
+	MOV	EBP,ESP
+	CALL	_wait_KBC_sendready
+	PUSH	96
+	PUSH	100
+	CALL	_io_out8
+	CALL	_wait_KBC_sendready
+	PUSH	71
+	PUSH	96
+	CALL	_io_out8
+	LEAVE
+	RET
+	GLOBAL	_enable_mouse
+_enable_mouse:
+	PUSH	EBP
+	MOV	EBP,ESP
+	CALL	_wait_KBC_sendready
+	PUSH	212
+	PUSH	100
+	CALL	_io_out8
+	CALL	_wait_KBC_sendready
+	PUSH	244
+	PUSH	96
+	CALL	_io_out8
+	LEAVE
+	RET

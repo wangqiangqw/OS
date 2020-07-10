@@ -126,4 +126,9 @@ int fifo8_put(struct FIFO8 *fifo, unsigned char data);
 int fifo8_get(struct FIFO8 *fifo);
 int fifo8_status(struct FIFO8 *fifo);
 
+/*bootpack.c*/
+void wait_KBC_sendready(void);
+void init_keyborad(void);
+void enable_mouse(void);
+
 #endif
