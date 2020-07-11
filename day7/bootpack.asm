@@ -8,6 +8,7 @@
 	EXTERN	_io_sti
 	EXTERN	_keyfifo
 	EXTERN	_fifo8_init
+	EXTERN	_mousefifo
 	EXTERN	_io_out8
 	EXTERN	_init_palette
 	EXTERN	_init_screen
@@ -26,6 +27,8 @@
 LC0:
 	DB	"(%d, %d)",0x00
 LC1:
+	DB	"enable mouse",0x00
+LC2:
 	DB	"%02X",0x00
 [SECTION .text]
 	GLOBAL	_HariMain
@@ -36,7 +39,7 @@ _HariMain:
 	PUSH	ESI
 	PUSH	EBX
 	LEA	EBX,DWORD [-316+EBP]
-	SUB	ESP,340
+	SUB	ESP,468
 	CALL	_init_gdtidt
 	CALL	_init_pic
 	CALL	_io_sti
@@ -45,9 +48,15 @@ _HariMain:
 	PUSH	32
 	PUSH	_keyfifo
 	CALL	_fifo8_init
+	LEA	EAX,DWORD [-476+EBP]
+	PUSH	EAX
+	PUSH	128
+	PUSH	_mousefifo
+	CALL	_fifo8_init
 	PUSH	249
 	PUSH	33
 	CALL	_io_out8
+	ADD	ESP,32
 	PUSH	239
 	PUSH	161
 	CALL	_io_out8
@@ -59,9 +68,8 @@ _HariMain:
 	PUSH	EAX
 	PUSH	DWORD [4088]
 	CALL	_init_screen
-	ADD	ESP,40
-	MOVSX	EAX,WORD [4084]
 	MOV	ECX,2
+	MOVSX	EAX,WORD [4084]
 	LEA	EDX,DWORD [-16+EAX]
 	MOV	EAX,EDX
 	CDQ
@@ -87,10 +95,9 @@ _HariMain:
 	PUSH	EAX
 	PUSH	DWORD [4088]
 	CALL	_putblock8_8
-	ADD	ESP,40
+	ADD	ESP,60
 	PUSH	ESI
 	PUSH	EDI
-	MOV	EDI,16
 	PUSH	LC0
 	PUSH	EBX
 	CALL	_sprintf
@@ -104,66 +111,115 @@ _HariMain:
 	CALL	_putfont8_asc
 	ADD	ESP,40
 	CALL	_enable_mouse
+	PUSH	LC1
+	PUSH	7
+	PUSH	32
+	PUSH	16
+	MOVSX	EAX,WORD [4084]
+	PUSH	EAX
+	PUSH	DWORD [4088]
+	CALL	_putfont8_asc
+	ADD	ESP,24
 L2:
 	CALL	_io_cli
 	PUSH	_keyfifo
 	CALL	_fifo8_status
-	POP	EDX
+	PUSH	_mousefifo
+	MOV	EBX,EAX
+	CALL	_fifo8_status
+	LEA	EAX,DWORD [EAX+EBX*1]
+	POP	EBX
+	POP	ESI
 	TEST	EAX,EAX
-	JE	L8
+	JE	L12
 	PUSH	_keyfifo
-	LEA	ESI,DWORD [-60+EBP]
+	CALL	_fifo8_status
+	POP	ECX
+	TEST	EAX,EAX
+	JE	L7
+	PUSH	_keyfifo
 	CALL	_fifo8_get
 	MOV	BL,AL
 	CALL	_io_sti
-	MOVZX	EBX,BL
+	MOVZX	EAX,BL
+	PUSH	EAX
+	LEA	EBX,DWORD [-60+EBP]
+	PUSH	LC2
 	PUSH	EBX
-	PUSH	LC1
-	PUSH	ESI
 	CALL	_sprintf
-	MOV	EBX,DWORD [-352+EBP]
-	SAL	EBX,4
 	PUSH	31
 	PUSH	15
-	PUSH	EDI
-	PUSH	EBX
+	PUSH	16
+	PUSH	0
 	PUSH	14
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [4088]
 	CALL	_boxfill8
 	ADD	ESP,44
-	PUSH	ESI
-	PUSH	7
-	PUSH	EDI
 	PUSH	EBX
+	PUSH	7
+	PUSH	16
+	PUSH	0
+L11:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [4088]
 	CALL	_putfont8_asc
 	ADD	ESP,24
-	CMP	DWORD [-352+EBP],16
-	JE	L9
-L7:
-	INC	DWORD [-352+EBP]
-	JMP	L2
-L9:
-	MOV	DWORD [-352+EBP],0
-	ADD	EDI,16
-	JMP	L7
 L8:
+	CMP	DWORD [-480+EBP],16
+	JE	L13
+L10:
+	INC	DWORD [-480+EBP]
+	JMP	L2
+L13:
+	MOV	DWORD [-480+EBP],0
+	JMP	L10
+L7:
+	PUSH	_mousefifo
+	CALL	_fifo8_status
+	POP	EDX
+	TEST	EAX,EAX
+	JE	L8
+	PUSH	_mousefifo
+	CALL	_fifo8_get
+	MOV	BL,AL
+	CALL	_io_sti
+	MOVZX	EAX,BL
+	PUSH	EAX
+	LEA	EBX,DWORD [-60+EBP]
+	PUSH	LC2
+	PUSH	EBX
+	CALL	_sprintf
+	PUSH	31
+	PUSH	47
+	PUSH	16
+	PUSH	32
+	PUSH	14
+	MOVSX	EAX,WORD [4084]
+	PUSH	EAX
+	PUSH	DWORD [4088]
+	CALL	_boxfill8
+	ADD	ESP,44
+	PUSH	EBX
+	PUSH	7
+	PUSH	16
+	PUSH	32
+	JMP	L11
+L12:
 	CALL	_io_stihlt
 	JMP	L2
 	GLOBAL	_wait_KBC_sendready
 _wait_KBC_sendready:
 	PUSH	EBP
 	MOV	EBP,ESP
-L11:
+L15:
 	PUSH	100
 	CALL	_io_in8
-	POP	ECX
+	POP	EDX
 	AND	EAX,2
-	JNE	L11
+	JNE	L15
 	LEAVE
 	RET
 	GLOBAL	_init_keyboard
