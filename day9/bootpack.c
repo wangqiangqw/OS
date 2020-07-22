@@ -39,7 +39,29 @@ unsigned int memman_total(struct MEMMAN *man)
 	return t;
 }
 
-unsigned int 
+unsigned int memman_alloc(struct MEMMAN *man, unsigned int size)
+{
+	unsigned int i, a;
+	for(i=0;i<man->frees;i++)
+	{
+		if(man->free[i].size >=size)
+		{
+			a = man->free[i].addr;
+			man->free[i].addr+=size;
+			man->free[i].size-=size;
+			if(man->free[i].size == 0)
+			{
+				man->frees--;
+				for(;i<man->frees;i++)
+				{
+					man->free[i]=man->free[i+1];
+				}
+			}
+			return a;
+		}
+	}
+	return 0;
+}
 
 unsigned int memtest(unsigned int start, unsigned int end)
 {
