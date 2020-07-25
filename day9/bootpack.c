@@ -7,6 +7,7 @@ extern struct FIFO8 mousefifo;
 #define EFLAGS_AC_BIT		0X00040000
 #define CR0_CACHE_DISABLE	0X60000000
 #define MEMMAN_FREES		4090
+#define MEMMAN_ADDR			0x003c0000
 
 struct FREEINFO
 {
@@ -63,6 +64,64 @@ unsigned int memman_alloc(struct MEMMAN *man, unsigned int size)
 	return 0;
 }
 
+int memman_free(struct MEMMAN *man, unsigned int addr, unsigned int size)
+{
+	int i, j;
+	for(i=0;i<man->frees;i++)
+	{
+		if(man->free[i].addr>addr)
+		{
+			break;
+		}
+	}
+	if(i>0)
+	{
+		if(man->free[i-1].addr+man->free[i-1].size ==addr)
+		{
+			man->free[i-1].size+=size;
+			if(i<man->frees)
+			{
+				if(addr+size ==man->free[i].addr)
+				{
+					man->free[i-1].size+=man->free[i].size;
+					man->frees--;
+					for(;i<man->frees;i++)
+					{
+						man->free[i] = man->free[i+1];
+					}
+				}
+			}
+			return 0;
+		}
+	}
+	if(i<man->frees)
+	{
+		if(addr+size==man->free[i].addr)
+		{
+			man->free[i].addr=addr;
+			man->free[i].size += size;
+			return 0;
+		}
+	}
+	if(man->frees<MEMMAN_FREES)
+	{
+		for(j=man->frees;j>i;j--)
+		{
+			man->free[j]=man->free[j-1];
+		}
+		man->frees++;
+		if(man->maxfrees<man->frees)
+		{
+			man->maxfrees=man->frees;
+		}
+		man->free[i].addr = addr;
+		man->free[i].size = size;
+		return 0;
+	}
+	man->losts++;
+	man->lostsize+=size;
+	return -1;
+}
 unsigned int memtest(unsigned int start, unsigned int end)
 {
 	char flg486 = 0;
@@ -130,6 +189,8 @@ void HariMain(void)
 
 	char s[40], mcursor[256],keybuf[32],mousebuf[128];
 	int mx, my;
+	unsigned int memtotal;
+	struct MEMMAN *memman = (struct MEMMAN*) MEMMAN_ADDR;
 
 	init_gdtidt();
 	init_pic();
@@ -151,8 +212,14 @@ void HariMain(void)
 	
 	enable_mouse(&mdec);
 
-	int memsize = memtest(0x00400000,0xbfffffff)/(1024*1024);
-	sprintf(s,"memory %dMB",memsize);
+
+
+	memtotal=memtest(0x00400000,0xbfffffff);;
+	memman_init(memman);
+	memman_free(memman, 0x00001000,0x0009e000);
+	memman_free(memman, 0x00400000,memtotal-0x00400000);
+
+	sprintf(s,"memory %dMB free: %dKB",memtotal/(1024*1024),memman_total(memman)/1024);
 	putfont8_asc(binfo->vram,binfo->scrnx,0,32,COL8_FFFFFF,s);
 
     for(;;)
