@@ -5,9 +5,6 @@
 extern struct FIFO8 keyfifo;
 extern struct FIFO8 mousefifo;
 
-
-
-
 void HariMain(void)
 {
 
@@ -56,24 +53,31 @@ void HariMain(void)
 	sprintf(s, "memory %dMB   free : %dKB",
 			memtotal / (1024 * 1024), memman_total(memman) / 1024);
 	putfont8_asc(buf_back, binfo->scrnx, 0, 32, COL8_FFFFFF, s);
-	sheet_refresh(shtctl,sht_back,0,0,binfo->scrnx,48);
+	//sheet_refresh(shtctl, sht_back, 0, 0, binfo->scrnx, 48);
+	sheet_refreshfull(shtctl);
 
     for (;;) {
         io_cli();
 		if (fifo8_status(&keyfifo) + fifo8_status(&mousefifo) == 0) {
 			io_stihlt();
 		} else {
-			if (fifo8_status(&keyfifo) != 0) {
+			if (fifo8_status(&keyfifo) != 0) 
+			{
 				i = fifo8_get(&keyfifo);
 				io_sti();
 				sprintf(s, "%02X", i);
-				boxfill8(buf_back, binfo->scrnx, COL8_008484,  0, 16, 15, 31);
+				//boxfill8(binfo->vram,binfo->scrnx,COL8_008484, 0, 16, 15, 31);
+				//putfont8_asc(binfo->vram,binfo->scrnx,0/*mx+m*16*/,16/*my+n*16*/,COL8_FFFFFF,s);
+				boxfill8(buf_back,   binfo->scrnx, COL8_008484,0, 16, 15, 31);
 				putfont8_asc(buf_back, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
-				sheet_refresh(shtctl,sht_back,0,16,16,32);
-			} else if (fifo8_status(&mousefifo) != 0) {
+				//sheet_refresh(shtctl, sht_back, 0, 16, 16, 32);
+				sheet_refreshfull(shtctl);
+			} else if (fifo8_status(&mousefifo) != 0) 
+			{
 				i = fifo8_get(&mousefifo);
 				io_sti();
-				if (mouse_decode(&mdec, i) != 0) {
+				if (mouse_decode(&mdec, i) != 0) 
+				{
 					sprintf(s, "[lcr %4d %4d]", mdec.x, mdec.y);
 					if((mdec.btn & 0x01)!=0)
 						s[1] = 'L';
@@ -83,7 +87,7 @@ void HariMain(void)
 						s[2] = 'C';
 					boxfill8(buf_back, binfo->scrnx, COL8_008484, 32, 16, 32 + 15 * 8 - 1, 31);
 					putfont8_asc(buf_back, binfo->scrnx, 32, 16, COL8_FFFFFF, s);
-					sheet_refresh(shtctl,sht_back,32,16,32+15*8,32);
+					//sheet_refresh(shtctl, sht_back, 32, 16, 32 + 15 * 8, 32);
 					mx += mdec.x;
 					my += mdec.y;
 					if (mx < 0) 
@@ -97,8 +101,9 @@ void HariMain(void)
 					sprintf(s, "(%3d, %3d)", mx, my);
 					boxfill8(buf_back, binfo->scrnx, COL8_008484, 0, 0, 79, 15);
 					putfont8_asc(buf_back, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
-					sheet_refresh(shtctl,sht_back,0,0,80,16);
+					//sheet_refresh(shtctl, sht_back, 0, 0, 80, 16);
 					sheet_slide(shtctl, sht_mouse, mx, my);
+					//sheet_refreshfull(shtctl);
 				}
 			}			
 		}
