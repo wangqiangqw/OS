@@ -45,7 +45,7 @@ void sheet_setbuf(struct SHEET *sht, unsigned char *buf, int xsize, int ysize, i
     sht->col_inv = col_inv;
     return;
 }
-void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1)
+/*void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1)
 {
     int h, bx, by, vx, vy;
     unsigned char *buf, c, *vram = ctl->vram;
@@ -58,6 +58,39 @@ void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1)
             for (bx = 0; bx < sht->bxsize; bx++)  {
                 vx = sht->vx0 + bx;
                 if (vx0 <= vx && vx < vx1 && vy0 <= vy && vy < vy1)  {
+                    c = buf[by * sht->bxsize + bx];
+                    if (c != sht->col_inv) {
+                        vram[vy * ctl->xsize + vx] = c;
+                    }
+                }
+            }
+        }
+    }
+    return;
+}*/
+
+void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1)
+{
+    int h, bx, by, bx0, by0, bx1, by1, vx,vy;
+    unsigned char *buf, c, *vram = ctl->vram;
+    struct SHEET *sht;
+    for (h = 0; h <= ctl->top; h++) {
+        sht = ctl->sheets[h];
+        buf = sht->buf;
+        bx0=vx0 - sht->vx0;
+        bx0 = bx0>=0? bx0:0;
+        bx1=vx1 - sht->vx0;
+        bx1 = bx1<=(sht->bxsize-1)? bx1+1:sht->bxsize-1;
+        by0=vy0 - sht->vy0;
+        by0 = by0>=0? by0:0;
+        by1=vy1 - sht->vy0;
+        by1 = by1<=(sht->bysize-1)? by1:sht->bysize-1;
+
+        for (by = by0; by <=by1; by++) {
+            vy = sht->vy0 + by;
+            for (bx = bx0; bx <=bx1; bx++)  {
+                vx = sht->vx0 + bx;
+                {
                     c = buf[by * sht->bxsize + bx];
                     if (c != sht->col_inv) {
                         vram[vy * ctl->xsize + vx] = c;
