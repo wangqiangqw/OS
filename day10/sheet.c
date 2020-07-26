@@ -53,11 +53,14 @@ void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1)
     for (h = 0; h <= ctl->top; h++) {
         sht = ctl->sheets[h];
         buf = sht->buf;
-        for (by = 0; by < sht->bysize; by++) {
+        for (by = 0; by < sht->bysize; by++) 
+        {
             vy = sht->vy0 + by;
-            for (bx = 0; bx < sht->bxsize; bx++) {
-                    vx = sht->vx0 + bx;
-                    if (vx0 <= vx && vx < vx1 && vy0 <= vy && vy < vy1) {
+            for (bx = 0; bx < sht->bxsize; bx++) 
+            {
+                vx = sht->vx0 + bx;
+                if (vx0 <= vx && vx < vx1 && vy0 <= vy && vy < vy1) 
+                {
                     c = buf[by * sht->bxsize + bx];
                     if (c != sht->col_inv) {
                         vram[vy * ctl->xsize + vx] = c;
@@ -157,9 +160,9 @@ void sheet_slide(struct SHTCTL *ctl, struct SHEET *sht, int vx0, int vy0)
     sht->vx0 = vx0;
     sht->vy0 = vy0;
     if (sht->height >= 0) { /* �������\�����Ȃ�A�V�����������̏��ɉ����ĉ�ʂ�`������ */
-        //sheet_refreshsub(ctl, old_vx0, old_vy0, old_vx0 + sht->bxsize, old_vy0 + sht->bysize);
-        //sheet_refreshsub(ctl, vx0, vy0, vx0 + sht->bxsize, vy0 + sht->bysize);
-        sheet_refreshfull(ctl);
+        sheet_refreshsub(ctl, old_vx0, old_vy0, old_vx0 + sht->bxsize, old_vy0 + sht->bysize);
+        sheet_refreshsub(ctl, vx0, vy0, vx0 + sht->bxsize, vy0 + sht->bysize);
+        //sheet_refreshfull(ctl);
     }
     return;
 }

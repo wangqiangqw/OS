@@ -84,8 +84,7 @@ void putfont8(char *vram, int xsize,int x,int y, char c, char *font)
 	int i;
 	char d;
 	char *p;
-	for(i=0;
-	i<16;i++)
+	for(i=0; i<16;i++)
 	{
 		p=vram+(y+i)*xsize+x;
 		d=font[i];

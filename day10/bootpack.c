@@ -70,8 +70,8 @@ void HariMain(void)
 				//putfont8_asc(binfo->vram,binfo->scrnx,0/*mx+m*16*/,16/*my+n*16*/,COL8_FFFFFF,s);
 				boxfill8(buf_back,   binfo->scrnx, COL8_008484,0, 16, 15, 31);
 				putfont8_asc(buf_back, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
-				//sheet_refresh(shtctl, sht_back, 0, 16, 16, 32);
-				sheet_refreshfull(shtctl);
+				sheet_refresh(shtctl, sht_back, 0, 16, 16, 32);
+				//sheet_refreshfull(shtctl);
 			} else if (fifo8_status(&mousefifo) != 0) 
 			{
 				i = fifo8_get(&mousefifo);
@@ -87,7 +87,7 @@ void HariMain(void)
 						s[2] = 'C';
 					boxfill8(buf_back, binfo->scrnx, COL8_008484, 32, 16, 32 + 15 * 8 - 1, 31);
 					putfont8_asc(buf_back, binfo->scrnx, 32, 16, COL8_FFFFFF, s);
-					//sheet_refresh(shtctl, sht_back, 32, 16, 32 + 15 * 8, 32);
+					sheet_refresh(shtctl, sht_back, 32, 16, 32 + 15 * 8, 32);
 					mx += mdec.x;
 					my += mdec.y;
 					if (mx < 0) 
