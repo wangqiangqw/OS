@@ -53,14 +53,11 @@ void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1)
     for (h = 0; h <= ctl->top; h++) {
         sht = ctl->sheets[h];
         buf = sht->buf;
-        for (by = 0; by < sht->bysize; by++) 
-        {
+        for (by = 0; by < sht->bysize; by++) {
             vy = sht->vy0 + by;
-            for (bx = 0; bx < sht->bxsize; bx++) 
-            {
+            for (bx = 0; bx < sht->bxsize; bx++)  {
                 vx = sht->vx0 + bx;
-                if (vx0 <= vx && vx < vx1 && vy0 <= vy && vy < vy1) 
-                {
+                if (vx0 <= vx && vx < vx1 && vy0 <= vy && vy < vy1)  {
                     c = buf[by * sht->bxsize + bx];
                     if (c != sht->col_inv) {
                         vram[vy * ctl->xsize + vx] = c;
@@ -82,8 +79,7 @@ void sheet_updown(struct SHTCTL *ctl, struct SHEET *sht, int height)
     }
     sht->height = height;
 
-    if (old > height)
-    {
+    if (old > height)  {
         if (height >= 0) {
             for (h = old; h > height; h--) {
                 ctl->sheets[h] = ctl->sheets[h - 1];
@@ -99,8 +95,8 @@ void sheet_updown(struct SHTCTL *ctl, struct SHEET *sht, int height)
             }
             ctl->top--;    
         }
-        //sheet_refreshsub(ctl, sht->vx0, sht->vy0, sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
-        sheet_refreshfull(ctl);
+        sheet_refreshsub(ctl, sht->vx0, sht->vy0, sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
+        //sheet_refreshfull(ctl);
     } else if (old < height) {
         if (old >= 0) {
             for (h = old; h < height; h++) {
@@ -116,8 +112,8 @@ void sheet_updown(struct SHTCTL *ctl, struct SHEET *sht, int height)
             ctl->sheets[height] = sht;
             ctl->top++;
         }
-        //sheet_refreshsub(ctl, sht->vx0, sht->vy0, sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
-        sheet_refreshfull(ctl);
+        sheet_refreshsub(ctl, sht->vx0, sht->vy0, sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
+        //sheet_refreshfull(ctl);
     }
     return;
 }

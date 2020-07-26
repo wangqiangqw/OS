@@ -1,3 +1,5 @@
+OBJS_BOOTPACK = bootpack.obj asmfunc.obj hankaku.obj graphic.obj dsctbl.obj \
+		int.obj fifo.obj keyboard.obj mouse.obj memory.obj sheet.obj
 TOOLPATH = ../tolset/z_tools/
 
 INCPATH  = ../tolset/z_tools/haribote/
@@ -6,9 +8,10 @@ MAKE     = $(TOOLPATH)make.exe -r
 NASK     = $(TOOLPATH)nask.exe
 CC1      = $(TOOLPATH)cc1.exe -I$(INCPATH) -Os -Wall -quiet
 GAS2NASK = $(TOOLPATH)gas2nask.exe -a
+OBJ2BIM  = $(TOOLPATH)obj2bim.exe
 MAKEFONT = $(TOOLPATH)makefont.exe
 BIN2OBJ  = $(TOOLPATH)bin2obj.exe
-OBJ2BIM  = $(TOOLPATH)obj2bim.exe
+
 BIM2HRB  = $(TOOLPATH)bim2hrb.exe
 RULEFILE = $(TOOLPATH)haribote/haribote.rul
 EDIMG    = $(TOOLPATH)edimg.exe
@@ -41,11 +44,9 @@ hankaku.obj : hankaku.bin Makefile
 %.obj:	%.asm Makefile
 		$(NASK) $*.asm $*.obj $*.lst
 	
-bootpack.bim : 	asmfunc.obj bootpack.obj hankaku.obj graphic.obj dsctbl.obj \
-				int.obj fifo.obj keyboard.obj mouse.obj memory.obj sheet.obj Makefile
+bootpack.bim : 	$(OBJS_BOOTPACK) Makefile
 		$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
-			bootpack.obj asmfunc.obj hankaku.obj graphic.obj dsctbl.obj int.obj \
-			fifo.obj keyboard.obj mouse.obj memory.obj sheet.obj
+			$(OBJS_BOOTPACK)
 
 bootpack.hrb : bootpack.bim Makefile
 		$(BIM2HRB) bootpack.bim bootpack.hrb 0

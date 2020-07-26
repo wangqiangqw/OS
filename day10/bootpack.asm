@@ -20,20 +20,19 @@
 	EXTERN	_sheet_alloc
 	EXTERN	_memman_alloc_4k
 	EXTERN	_sheet_setbuf
-	EXTERN	_init_screen
+	EXTERN	_init_screen8
 	EXTERN	_init_mouse_cursor8
 	EXTERN	_sheet_slide
 	EXTERN	_sheet_updown
 	EXTERN	_sprintf
-	EXTERN	_putfont8_asc
+	EXTERN	_putfonts8_asc
 	EXTERN	_memman_total
-	EXTERN	_sheet_refreshfull
+	EXTERN	_sheet_refresh
 	EXTERN	_io_cli
 	EXTERN	_fifo8_status
 	EXTERN	_fifo8_get
 	EXTERN	_mouse_decode
 	EXTERN	_boxfill8
-	EXTERN	_sheet_refresh
 	EXTERN	_io_stihlt
 [FILE "bootpack.c"]
 [SECTION .data]
@@ -139,7 +138,7 @@ _HariMain:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [-512+EBP]
-	CALL	_init_screen
+	CALL	_init_screen8
 	ADD	ESP,32
 	PUSH	99
 	PUSH	EBX
@@ -190,7 +189,7 @@ _HariMain:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [-512+EBP]
-	CALL	_putfont8_asc
+	CALL	_putfonts8_asc
 	PUSH	3932160
 	CALL	_memman_total
 	SHR	DWORD [-496+EBP],20
@@ -208,10 +207,17 @@ _HariMain:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [-512+EBP]
-	CALL	_putfont8_asc
+	CALL	_putfonts8_asc
+	PUSH	48
+	MOVSX	EAX,WORD [4084]
+	PUSH	EAX
+	PUSH	0
+L18:
+	PUSH	0
+	PUSH	DWORD [-504+EBP]
 	PUSH	DWORD [-500+EBP]
-	CALL	_sheet_refreshfull
-	ADD	ESP,28
+	CALL	_sheet_refresh
+	ADD	ESP,48
 L2:
 	CALL	_io_cli
 	PUSH	_keyfifo
@@ -223,12 +229,12 @@ L2:
 	POP	EBX
 	POP	EDX
 	TEST	EAX,EAX
-	JE	L18
+	JE	L19
 	PUSH	_keyfifo
 	CALL	_fifo8_status
 	POP	ECX
 	TEST	EAX,EAX
-	JNE	L19
+	JNE	L20
 	PUSH	_mousefifo
 	CALL	_fifo8_status
 	POP	EDX
@@ -282,7 +288,7 @@ L13:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [-512+EBP]
-	CALL	_putfont8_asc
+	CALL	_putfonts8_asc
 	ADD	ESP,52
 	PUSH	32
 	PUSH	152
@@ -294,10 +300,10 @@ L13:
 	ADD	ESP,24
 	ADD	EDI,DWORD [-228+EBP]
 	ADD	ESI,DWORD [-232+EBP]
-	JS	L20
+	JS	L21
 L14:
 	TEST	EDI,EDI
-	JS	L21
+	JS	L22
 L15:
 	MOVSX	EAX,WORD [4084]
 	SUB	EAX,16
@@ -333,21 +339,29 @@ L17:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [-512+EBP]
-	CALL	_putfont8_asc
+	CALL	_putfonts8_asc
+	PUSH	16
+	PUSH	80
+	PUSH	0
+	PUSH	0
+	PUSH	DWORD [-504+EBP]
+	PUSH	DWORD [-500+EBP]
+	CALL	_sheet_refresh
+	ADD	ESP,48
 	PUSH	EDI
 	PUSH	ESI
 	PUSH	DWORD [-508+EBP]
 	PUSH	DWORD [-500+EBP]
 	CALL	_sheet_slide
-	ADD	ESP,40
+	ADD	ESP,16
 	JMP	L2
-L21:
+L22:
 	XOR	EDI,EDI
 	JMP	L15
-L20:
+L21:
 	XOR	ESI,ESI
 	JMP	L14
-L19:
+L20:
 	PUSH	_keyfifo
 	CALL	_fifo8_get
 	MOV	EBX,EAX
@@ -374,9 +388,11 @@ L19:
 	MOVSX	EAX,WORD [4084]
 	PUSH	EAX
 	PUSH	DWORD [-512+EBP]
-	CALL	_putfont8_asc
-	ADD	ESP,24
-	JMP	L2
-L18:
+	CALL	_putfonts8_asc
+	PUSH	32
+	PUSH	16
+	PUSH	16
+	JMP	L18
+L19:
 	CALL	_io_stihlt
 	JMP	L2
