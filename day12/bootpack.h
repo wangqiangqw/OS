@@ -34,6 +34,7 @@ void load_idtr(int limit, int addr);
 
 int load_cr0(void);
 void store_cr0(int cr0);
+void asm_inthandler20(void);
 void asm_inthandler21(void);
 void asm_inthandler27(void);
 void asm_inthandler2c(void);
@@ -194,4 +195,21 @@ void sheet_refreshfull(struct SHTCTL *ctl);
 void sheet_slide(struct SHEET *sht, int vx0, int vy0);
 void sheet_free(struct SHEET * sht);
 void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1,int h0);
+
+/*timer.c*/
+#define MAX_TIMER 500
+struct TIMER
+{
+	unsigned int timeout, flags;
+	struct FIFO8 *fifo;
+	unsigned char data;
+};
+struct TIMERCTL
+{
+	unsigned int count;
+	struct TIMER timer[MAX_TIMER];
+};
+void init_pit(void);
+void inthandler21(int *esp);
+void settimer(unsigned int timeout, struct FIFO8 *fifo, unsigned char data);
 #endif
