@@ -8,11 +8,12 @@ struct TIMERCTL timerctl;
 
 void init_pit(void)
 {
+    int i;
     io_out8(PIT_CTRL, 0X34);
     io_out8(PIT_CNT0, 0X9C);
     io_out8(PIT_CNT0, 0X2E);
     timerctl.count=0;
-    for(int i =0 ;i<MAX_TIMER;i++)
+    for(i =0 ;i<MAX_TIMER;i++)
     {
         timerctl.timer[i].flags = 0;
     }
@@ -54,9 +55,10 @@ void timer_settime(struct TIMER * timer, unsigned int timeout)
 
 void inthandler20(int *esp)
 {
+    int i;
     io_out8(PIC0_OCW2,0x60);
     timerctl.count++;
-    for(int i = 0; i< MAX_TIMER; i++)
+    for(i = 0; i< MAX_TIMER; i++)
     {
         if(timerctl.timer[i].flags == TIMER_FLAGS_USING)
         {
@@ -72,7 +74,7 @@ void inthandler20(int *esp)
     return;
 }
 
-void settimer(unsigned int timeout, struct FIFO8 *fifo, unsigned char data)
+/*void settimer(unsigned int timeout, struct FIFO8 *fifo, unsigned char data)
 {
     int eflags;
     eflags = io_load_eflags();
@@ -82,4 +84,4 @@ void settimer(unsigned int timeout, struct FIFO8 *fifo, unsigned char data)
     timerctl.data = data;
     io_store_eflags(eflags);
     return;
-}
+}*/
