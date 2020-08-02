@@ -4,16 +4,19 @@
 
 
 extern struct TIMERCTL timerctl;
+void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
 void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 void HariMain(void)
 {
 
 	struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
 	struct FIFO32 fifo;
-	int fifobuf[128];
+
 	char s[40];
+	int fifobuf[128];
 	struct TIMER * timer, * timer2, *timer3, *timer4;
-	int mx, my, i;
+	int mx, my, i,cursor_x, cursor_c;
 	unsigned int memtotal, count = 0;
 	struct MOUSE_DEC mdec;
 	struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
@@ -28,13 +31,18 @@ void HariMain(void)
 		0,   0,   0,   0,   0,   0,   0,   '7', '8', '9', '-', '4', '5', '6', '+', '1',
 		'2', '3', '0', '.'
 	};
-	int cursor_x, cursor_c;
+
 
 	init_gdtidt();
 	init_pic();
-	init_pit();
+
 	io_sti(); /* IDT/PIC‚Ì‰Šú‰»‚ªI‚í‚Á‚½‚Ì‚ÅCPU‚ÌŠ„‚èž‚Ý‹ÖŽ~‚ð‰ðœ */
 	fifo32_init(&fifo, 128, fifobuf);
+	init_pit();
+	init_keyboard(&fifo,256);
+	enable_mouse(&fifo,512,&mdec);
+	io_out8(PIC0_IMR, 0xf8); /* PIC1�ƃL�[�{�[�h������(11111001) */
+	io_out8(PIC1_IMR, 0xef); /* �}�E�X������(11101111) */
 	timer = timer_alloc();
 	timer_init(timer, &fifo,10);
 	timer_settime(timer,1000);
@@ -48,11 +56,7 @@ void HariMain(void)
 	timer_init(timer4,&fifo,255); // only for timer adjust for 1 year.
 	timer_settime(timer4,3153600000); // 1 year.
 
-	io_out8(PIC0_IMR, 0xf8); /* PIC1�ƃL�[�{�[�h������(11111001) */
-	io_out8(PIC1_IMR, 0xef); /* �}�E�X������(11101111) */
 
-	init_keyboard(&fifo,256);
-	enable_mouse(&fifo,512,&mdec);
 	memtotal = memtest(0x00400000, 0xbfffffff);
 	memman_init(memman);
 	memman_free(memman, 0x00001000, 0x0009e000); /* 0x00001000 - 0x0009efff */
@@ -71,14 +75,15 @@ void HariMain(void)
 	init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 	init_mouse_cursor8(buf_mouse, 99);
 	make_window8(buf_win,160,68,"counter");
-	//putfonts8_asc(buf_win,160,24,28,COL8_000000,"Welcome to");
-	//putfonts8_asc(buf_win,160,24,44,COL8_000000,"  Haribote-OS");
+
+	make_textbox8(sht_win,8,28,144,16,COL8_FFFFFF);	
+	cursor_x=8;
+	cursor_c=COL8_FFFFFF;
 
 	sheet_slide(sht_back, 0, 0);
 	mx = (binfo->scrnx - 16) / 2; /* ��ʒ����ɂȂ�悤�ɍ��W�v�Z */
 	my = (binfo->scrny - 28 - 16) / 2;
 	sheet_slide(sht_mouse, mx, my);
-	make_textbox8(sht_win,8,28,144,16,COL8_FFFFFF);	//sheet_refreshfull(shtctl);
 	sheet_slide(sht_win,80,72);
 	sheet_updown( sht_back,  0);
 	sheet_updown(sht_win,1);
@@ -89,8 +94,6 @@ void HariMain(void)
 			memtotal / (1024 * 1024), memman_total(memman) / 1024);
 	putfonts8_asc(buf_back, binfo->scrnx, 0, 32, COL8_FFFFFF, s);
 	sheet_refresh( sht_back, 0, 0, binfo->scrnx, 48);
-	cursor_x=8;
-	cursor_c=COL8_FFFFFF;
 
     for (;;) {
 		count++;
@@ -110,7 +113,7 @@ void HariMain(void)
 				{
 					s[0]=keytable[i-256];
 					s[1]=0;
-					putfonts8_asc_sht(sht_win,cursor_x,28,COL8_000000,COL8_C6C6C6,s,1);
+					putfonts8_asc_sht(sht_win,cursor_x,28,COL8_000000,COL8_FFFFFF,s,1);
 					cursor_x+=8;
 				}
 				if(i==256+0x0e && cursor_x>8)
@@ -253,6 +256,14 @@ void make_window8(unsigned char *buf, int xsize, int ysize, char *title)
 			
 		}
 	}
+	return;
+}
+
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l)
+{
+	boxfill8(sht->buf, sht->bxsize, b, x, y, x + l * 8 - 1, y + 15);
+	putfonts8_asc(sht->buf, sht->bxsize, x, y, c, s);
+	sheet_refresh(sht, x, y, x + l * 8, y + 16);
 	return;
 }
 void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c)

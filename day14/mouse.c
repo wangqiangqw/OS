@@ -3,14 +3,6 @@ struct FIFO32 *mousefifo;
 int mousedata0;
 void inthandler2c(int *esp)
 {
-	/*struct BOOTINFO *binfo  = (struct BOOTINFO *) ADR_BOOTINFO;
-	boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32*8-1,15);
-	static i=1;
-	extern char hankaku[4096];
-	putfont8_asc(binfo->vram,binfo->scrnx,0,0,COL8_FFFFFF,"INT 2c (IRQ-12) : PS/2 MOUSE");
-	putfont8(binfo->vram,binfo->scrnx,8*i,8*i,COL8_FFFFFF,hankaku +i*16);
-	for(;;)
-		io_hlt();*/
 	int data;
 	io_out8(PIC1_OCW2,0x64);
 	io_out8(PIC0_OCW2,0x62);

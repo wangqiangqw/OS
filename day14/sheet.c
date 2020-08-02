@@ -129,8 +129,8 @@ void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1,int
 }
 void sheet_updown(struct SHEET *sht, int height)
 {
-    int h, old = sht->height;
     struct SHTCTL *ctl = sht->ctl;
+    int h, old = sht->height;
     if (height > ctl->top + 1) {
         height = ctl->top + 1;
     }
@@ -216,14 +216,15 @@ void sheet_refreshfull(struct SHTCTL *ctl)
 
 void sheet_slide( struct SHEET *sht, int vx0, int vy0)
 {
+    struct SHTCTL *ctl = sht->ctl;
     int old_vx0 = sht->vx0, old_vy0 = sht->vy0;
     sht->vx0 = vx0;
     sht->vy0 = vy0;
     if (sht->height >= 0) { /* �������\�����Ȃ�A�V�����������̏��ɉ����ĉ�ʂ�`������ */
-        sheet_refreshmap(sht->ctl, old_vx0, old_vy0, old_vx0 + sht->bxsize, old_vy0 + sht->bysize,0);
-        sheet_refreshmap(sht->ctl, vx0, vy0, vx0 + sht->bxsize, vy0 + sht->bysize,sht->height);
-        sheet_refreshsub(sht->ctl, old_vx0, old_vy0, old_vx0 + sht->bxsize, old_vy0 + sht->bysize,0,sht->height - 1);
-        sheet_refreshsub(sht->ctl, vx0, vy0, vx0 + sht->bxsize, vy0 + sht->bysize,sht->height, sht->height);
+        sheet_refreshmap(ctl, old_vx0, old_vy0, old_vx0 + sht->bxsize, old_vy0 + sht->bysize,0);
+        sheet_refreshmap(ctl, vx0, vy0, vx0 + sht->bxsize, vy0 + sht->bysize,sht->height);
+        sheet_refreshsub(ctl, old_vx0, old_vy0, old_vx0 + sht->bxsize, old_vy0 + sht->bysize,0,sht->height - 1);
+        sheet_refreshsub(ctl, vx0, vy0, vx0 + sht->bxsize, vy0 + sht->bysize,sht->height, sht->height);
         //sheet_refreshfull(ctl);
     }
     return;
@@ -238,10 +239,3 @@ void sheet_free(struct SHEET *sht)
     return;
 }
 
-void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l)
-{
-	boxfill8(sht->buf,sht->bxsize,b,x,y,x+l*8-1,y+15);
-	putfonts8_asc(sht->buf,sht->bxsize,x,y,c,s);
-	sheet_refresh(sht,x,y,x+l*8,y+16);
-	return;
-}

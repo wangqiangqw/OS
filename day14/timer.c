@@ -1,28 +1,32 @@
 #include "bootpack.h"
 
-#define PIT_CTRL    0X0043
-#define PIT_CNT0    0X0040
+#define PIT_CTRL    0x0043
+#define PIT_CNT0    0x0040
+struct TIMERCTL timerctl;
 #define TIMER_FLAGS_ALLOC   1
 #define TIMER_FLAGS_USING   2
-struct TIMERCTL timerctl;
+
 
 void init_pit(void)
 {
     int i;
-    io_out8(PIT_CTRL, 0X34);
-    io_out8(PIT_CNT0, 0X9C);
-    io_out8(PIT_CNT0, 0X2E);
+    struct TIMER *t;
+    io_out8(PIT_CTRL, 0x34);
+    io_out8(PIT_CNT0, 0x9c);
+    io_out8(PIT_CNT0, 0x2e);
     timerctl.count=0;
-    timerctl.next = 0xffffffff;
+
     for(i =0 ;i<MAX_TIMER;i++)
     {
         timerctl.timers0[i].flags = 0;
     }
-    timerctl.t0=timer_alloc();
-    timerctl.t0->timeout = 0xffffffff;
-    timerctl.t0->flags=TIMER_FLAGS_USING;
-    timerctl.t0->nextTimer=0;
-    timerctl.t0->fifo=0; // D A N G E R !!!  no fifo, make sure  fifo never used in this timer.
+    t=timer_alloc();
+    t->timeout = 0xffffffff;
+    t->flags=TIMER_FLAGS_USING;
+    t->nextTimer=0;
+    t->fifo=0; // D A N G E R !!!  no fifo, make sure  fifo never used in this timer.
+	timerctl.t0 = t;
+	timerctl.next = 0xffffffff;
     return;
 }
 
@@ -37,6 +41,7 @@ struct TIMER *timer_alloc(void)
             return &timerctl.timers0[i];
         }
     }
+	return 0;
 }
 
 void timer_free(struct TIMER * timer)
@@ -55,21 +60,22 @@ void timer_init(struct TIMER * timer, struct FIFO32 * fifo, int data)
 
 void timer_settime(struct TIMER * timer, unsigned int timeout)
 {
-    int e, i, j;
-    struct TIMER *s, *t;
-    timer->timeout = timeout + timer->timeout;
+    int e;
+    struct TIMER *t, *s;
+    timer->timeout = timeout + timerctl.count;
     timer->flags = TIMER_FLAGS_USING;
     e=io_load_eflags();
     io_cli();
-    if(timer->timeout<=timerctl.t0->timeout)
+    t = timerctl.t0;
+    if(timer->timeout<=t->timeout)
     {
-        timer->nextTimer= timerctl.t0;
         timerctl.t0=timer;
+        timer->nextTimer= t;
         timerctl.next = timer->timeout;
     }
     else
     {
-        s=timerctl.t0;
+        s=t;
         t=s->nextTimer;
         for(;;)
         {
@@ -86,20 +92,7 @@ void timer_settime(struct TIMER * timer, unsigned int timeout)
         }
     }
     
-    /*for(i=0;i<timerctl.using;i++)
-    {
-        if(timerctl.timers[i]->timeout>=timer->timeout)
-        {
-            break;
-        }
-    }
-    for(j=timerctl.using;j>i;j--)
-    {
-        timerctl.timers[j] = timerctl.timers[j-1];
-    }
-    timerctl.using++;
-    timerctl.timers[i] = timer;
-    timerctl.next = timerctl.timers[0]->timeout;*/
+
     io_store_eflags(e);
     return;
 }
@@ -133,26 +126,6 @@ void inthandler20(int *esp)
     }
     timerctl.next = s->timeout;
     timerctl.t0 = s;
-    /*for(i = 0; i< timerctl.using;i++)
-    {
-        if(timerctl.timers[i]->timeout>timerctl.count)
-        {
-            break;
-        }
-        timerctl.timers[i]->flags = TIMER_FLAGS_ALLOC;
-        fifo32_put(timerctl.timers[i]->fifo,timerctl.timers[i]->data);
-    }
-    timerctl.using -=i;
-    for(j=0;j<timerctl.using;j++)
-    {
-        timerctl.timers[j]= timerctl.timers[i+j];
-    }
-    if(timerctl.using>0){
-        timerctl.next = timerctl.timers[0]->timeout;
-    } else {
-        timerctl.next = 0xffffffff;
-    }*/
-
 
     return;
 }

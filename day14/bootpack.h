@@ -148,7 +148,7 @@ void inthandler2c(int *esp);
 
 void enable_mouse(struct FIFO32*fifo, int data0, struct MOUSE_DEC *mdec);
 int mouse_decode(struct MOUSE_DEC *mdec, int dat);
-void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
+
 
 
 /* memory.c */
@@ -198,16 +198,17 @@ void sheet_refreshfull(struct SHTCTL *ctl);
 void sheet_slide(struct SHEET *sht, int vx0, int vy0);
 void sheet_free(struct SHEET * sht);
 void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1,int h0);
-void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
+
 
 /*timer.c*/
 #define MAX_TIMER 500
 struct TIMER
 {
+	struct TIMER *nextTimer;
 	unsigned int timeout, flags;
 	struct FIFO32 *fifo;
 	int data;
-	struct TIMER *nextTimer;
+
 };
 struct TIMERCTL
 {
@@ -216,11 +217,12 @@ struct TIMERCTL
 	struct TIMER timers0[MAX_TIMER];
 };
 void init_pit(void);
-void inthandler20(int *esp);
+
 
 struct TIMER *timer_alloc(void);
 void timer_free(struct TIMER * timer);
 void timer_init(struct TIMER * timer, struct FIFO32 * fifo, int data);
 void timer_settime(struct TIMER * timer, unsigned int timeout);
+void inthandler20(int *esp);
 void adjustTimerCtl ( void );
 #endif
