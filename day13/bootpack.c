@@ -12,7 +12,7 @@ void HariMain(void)
 	struct FIFO32 fifo;
 	int fifobuf[128];
 	char s[40];
-	struct TIMER * timer, * timer2, *timer3;
+	struct TIMER * timer, * timer2, *timer3, *timer4;
 	int mx, my, i;
 	unsigned int memtotal, count = 0;
 	struct MOUSE_DEC mdec;
@@ -35,6 +35,9 @@ void HariMain(void)
 	timer3 = timer_alloc();
 	timer_init(timer3, &fifo,1);
 	timer_settime(timer3,50);
+	timer4 = timer_alloc();
+	timer_init(timer4,&fifo,255); // only for timer adjust for 1 year.
+	timer_settime(timer4,3153600000); // 1 year.
 
 	io_out8(PIC0_IMR, 0xf8); /* PIC1�ƃL�[�{�[�h������(11111001) */
 	io_out8(PIC1_IMR, 0xef); /* �}�E�X������(11101111) */
@@ -151,6 +154,10 @@ void HariMain(void)
 					}
 					timer_settime(timer3,50);
 					sheet_refresh(sht_back,8,96,16,112);
+					break;
+				case 255:
+					adjustTimerCtl();
+					timer_settime(timer4,3153600000);
 					break;
 				default:
 					break;
