@@ -5,7 +5,7 @@
 
 extern struct TIMERCTL timerctl;
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
-void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
+
 void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 
 /*struct TSS32 {
@@ -133,6 +133,7 @@ void HariMain(void)
 	tss_b.gs = 1 * 8;  
 	*((int *) (task_b_esp + 4)) = (int) sht_back;
 	//*((int*)0x0fec)=(int) sht_back;
+	mt_init();
 
 
 
@@ -218,7 +219,7 @@ void HariMain(void)
 					count=0;
 					break;
 				case 2:
-					farjmp(0,4*8);
+					//farjmp(0,4*8);
 					timer_settime(timer_ts,2);
 					break;
 				case 1:

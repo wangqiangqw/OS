@@ -3,7 +3,7 @@
 
 [INSTRSET "i486p"]				; 486�̖��߂܂Ŏg�������Ƃ����L�q
 
-VBEMODE EQU		0X107			; 1024 x  768 x 8bit�J���[
+VBEMODE EQU		0X105			; 1024 x  768 x 8bit�J���[
 ; �i��ʃ��[�h�ꗗ�j
 ;	0x100 :  640 x  400 x 8bit�J���[
 ;	0x101 :  640 x  480 x 8bit�J���[

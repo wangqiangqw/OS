@@ -198,7 +198,7 @@ void sheet_refreshfull(struct SHTCTL *ctl);
 void sheet_slide(struct SHEET *sht, int vx0, int vy0);
 void sheet_free(struct SHEET * sht);
 void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1,int h0);
-
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
 
 /*timer.c*/
 #define MAX_TIMER 500
@@ -235,9 +235,12 @@ struct TSS32
 	int es, cs, ss,ds,fs,gs;
 	int ldtr, iomap;
 };
+
 void task_b_main(struct SHEET *sht_back);
 void load_tr(int tr);
 void taskswitch3(void);
 void taskswitch4(void);
 void farjmp(int eip, int cs);
+void mt_taskswitch(void);
+void mt_init(void);
 #endif
