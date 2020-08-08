@@ -6,7 +6,7 @@ struct TIMERCTL timerctl;
 #define TIMER_FLAGS_ALLOC   1
 #define TIMER_FLAGS_USING   2
 extern struct TIMER *mt_timer;
-
+extern struct TIMER *task_timer;
 void init_pit(void)
 {
     int i;
@@ -115,7 +115,7 @@ void inthandler20(int *esp)
         if(s->timeout<=timerctl.count)
         {
             s->flags=TIMER_FLAGS_ALLOC;
-            if(s!=mt_timer)
+            if(s!=task_timer)
             {
             fifo32_put(s->fifo,s->data);
 
@@ -138,7 +138,7 @@ void inthandler20(int *esp)
     timerctl.t0 = s;
     if(ts!=0)
     {
-        mt_taskswitch();
+        task_switch();
     }
     return;
 }

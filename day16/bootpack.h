@@ -48,12 +48,13 @@ struct FIFO8{
 struct FIFO32{
 	int *buf;
 	int p, q, size, free, flags;
+	struct TASK *task;
 };
 void fifo8_init(struct FIFO8 *fifo, int size, unsigned char *buf);
 int fifo8_put(struct FIFO8 *fifo, unsigned char data);
 int fifo8_get(struct FIFO8 *fifo);
 int fifo8_status(struct FIFO8 *fifo);
-void fifo32_init(struct FIFO32 *fifo, int size, int *buf);
+void fifo32_init(struct FIFO32 *fifo, int size, int *buf,struct TASK *task);
 int fifo32_put(struct FIFO32 *fifo, int data);
 int fifo32_get(struct FIFO32 *fifo);
 int fifo32_status(struct FIFO32 *fifo);
@@ -228,6 +229,8 @@ void adjustTimerCtl ( void );
 
 /*  mtask.c */
 #define AR_TSS32		0x0089
+#define MAX_TASKS		1000
+#define TASK_GDT0		3
 struct TSS32
 {
 	int backlink, esp0, ss0, esp1,ss1,esp2,ss2,cr3;
@@ -236,6 +239,22 @@ struct TSS32
 	int ldtr, iomap;
 };
 
+struct TASK
+{
+	int sel, flags;
+	struct TSS32 tss;
+};
+
+struct TASKCTL
+{
+	int running;
+	int now;
+	struct TASK *tasks[MAX_TASKS];
+	struct TASK tasks0[MAX_TASKS];
+};
+
+
+
 void task_b_main(struct SHEET *sht_back);
 void load_tr(int tr);
 void taskswitch3(void);
@@ -243,4 +262,9 @@ void taskswitch4(void);
 void farjmp(int eip, int cs);
 void mt_taskswitch(void);
 void mt_init(void);
+struct TASK *task_init(struct MEMMAN * memman);
+struct TASK * task_alloc(void);
+void task_run(struct TASK *task);
+void task_switch(void);
+void task_sleep(struct TASK *task);
 #endif
