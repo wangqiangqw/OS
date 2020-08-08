@@ -22,16 +22,12 @@ void write_mem8(int addr, int data);
 void io_cli(void);
 void io_sti(void);
 void io_stihlt(void);
-
 int io_in8(int port);
 void io_out8(int port, int data);
 int  io_load_eflags(void);
 void io_store_eflags(int eflags);
-
-
 void  load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
-
 int load_cr0(void);
 void store_cr0(int cr0);
 void asm_inthandler20(void);
@@ -114,9 +110,7 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
 /* int.c */
 
 void init_pic(void);	
-
 void inthandler27(int *esp);
-
 
 #define PIC0_ICW1		0x0020
 #define PIC0_OCW2		0x0020
@@ -146,11 +140,8 @@ struct MOUSE_DEC{
 	int x, y, btn;
 };
 void inthandler2c(int *esp);
-
 void enable_mouse(struct FIFO32*fifo, int data0, struct MOUSE_DEC *mdec);
 int mouse_decode(struct MOUSE_DEC *mdec, int dat);
-
-
 
 /* memory.c */
 
@@ -163,8 +154,7 @@ struct FREEINFO{
 
 struct MEMMAN{
 	int frees, maxfrees, lostsize, losts;
-	struct FREEINFO free[MEMMAN_FREES];
-	
+	struct FREEINFO free[MEMMAN_FREES];	
 };
 unsigned int memtest(unsigned int start, unsigned int end);
 void memman_init(struct MEMMAN *man);
@@ -181,7 +171,6 @@ struct SHEET{
     int bxsize, bysize,vx0,vy0,col_inv,height,flags;
 	struct SHTCTL * ctl;
 };
-
 
 struct SHTCTL{
     unsigned char *vram, *map;
@@ -209,7 +198,6 @@ struct TIMER
 	unsigned int timeout, flags;
 	struct FIFO32 *fifo;
 	int data;
-
 };
 struct TIMERCTL
 {
@@ -252,8 +240,6 @@ struct TASKCTL
 	struct TASK *tasks[MAX_TASKS];
 	struct TASK tasks0[MAX_TASKS];
 };
-
-
 
 void task_b_main(struct SHEET *sht_back);
 void load_tr(int tr);

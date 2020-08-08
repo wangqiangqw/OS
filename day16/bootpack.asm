@@ -23,7 +23,6 @@
 	EXTERN	_init_screen8
 	EXTERN	_sprintf
 	EXTERN	_task_alloc
-	EXTERN	_task_b_main
 	EXTERN	_task_run
 	EXTERN	_timer_alloc
 	EXTERN	_timer_init
@@ -1050,3 +1049,76 @@ _make_textbox8:
 	POP	EDI
 	POP	EBP
 	RET
+[SECTION .data]
+LC7:
+	DB	"%11d",0x00
+[SECTION .text]
+	GLOBAL	_task_b_main
+_task_b_main:
+	PUSH	EBP
+	MOV	EBP,ESP
+	PUSH	EDI
+	PUSH	ESI
+	XOR	EDI,EDI
+	PUSH	EBX
+	LEA	EAX,DWORD [-556+EBP]
+	SUB	ESP,564
+	LEA	EBX,DWORD [-44+EBP]
+	MOV	DWORD [-576+EBP],0
+	PUSH	0
+	PUSH	EAX
+	PUSH	128
+	PUSH	EBX
+	CALL	_fifo32_init
+	CALL	_timer_alloc
+	PUSH	100
+	PUSH	EBX
+	MOV	ESI,EAX
+	PUSH	EAX
+	CALL	_timer_init
+	PUSH	100
+	PUSH	ESI
+	CALL	_timer_settime
+	ADD	ESP,36
+L68:
+	LEA	EBX,DWORD [-44+EBP]
+	CALL	_io_cli
+	PUSH	EBX
+	INC	EDI
+	CALL	_fifo32_status
+	POP	EDX
+	TEST	EAX,EAX
+	JE	L74
+	PUSH	EBX
+	CALL	_fifo32_get
+	MOV	EBX,EAX
+	CALL	_io_sti
+	POP	ECX
+	CMP	EBX,100
+	JNE	L68
+	MOV	EAX,EDI
+	LEA	EBX,DWORD [-572+EBP]
+	SUB	EAX,DWORD [-576+EBP]
+	PUSH	EAX
+	PUSH	LC7
+	PUSH	EBX
+	CALL	_sprintf
+	PUSH	11
+	PUSH	EBX
+	PUSH	8
+	PUSH	0
+	PUSH	28
+	PUSH	24
+	PUSH	DWORD [8+EBP]
+	CALL	_putfonts8_asc_sht
+	ADD	ESP,40
+	MOV	DWORD [-576+EBP],EDI
+	PUSH	100
+	PUSH	ESI
+	CALL	_timer_settime
+	POP	EAX
+	POP	EDX
+	JMP	L68
+L74:
+	CALL	_io_sti
+	JMP	L68
