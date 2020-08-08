@@ -51,6 +51,7 @@ void HariMain(void)
 	shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
 	task_a = task_init(memman);
 	fifo.task = task_a;
+	task_run(task_a,1,0);
 
 	sht_back  = sheet_alloc(shtctl);
 	buf_back  = (unsigned char *) memman_alloc_4k(memman, binfo->scrnx * binfo->scrny);
@@ -74,7 +75,7 @@ void HariMain(void)
 		task_b[i]->tss.fs = 1 * 8;  
 		task_b[i]->tss.gs = 1 * 8;  
 		*((int *) (task_b[i]->tss.esp + 4)) = (int) sht_win_b[i];
-		task_run(task_b[i]);
+		task_run(task_b[i],2, i+1);
 	}
 	sht_win   = sheet_alloc(shtctl);
 	buf_win   = (unsigned char *) memman_alloc_4k(memman, 160 * 52);
@@ -122,7 +123,7 @@ void HariMain(void)
 			if (256 <= i && i <= 511) {
 				sprintf(s, "%02X", i - 256);
 				putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF, COL8_008484, s, 2);
-				if (i<(256 + 0x54)&keytable[i - 256] !=0 &&cursor_x < 144)
+				if (i<(256 + 0x54) && keytable[i - 256] !=0 &&cursor_x < 144)
 				{
 					s[0] = keytable[i - 256];
 					s[1] = 0;
@@ -136,12 +137,12 @@ void HariMain(void)
 				}
 				boxfill8(sht_win->buf, sht_win->bxsize, cursor_c, cursor_x, 28, cursor_x + 7, 43);
 				sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
-						int j;
+						/*int j;
 						for(j=0;j<taskctl->running;j++)
 						{
 							sprintf(s, "Task: %d, Freq: %d",taskctl->tasks[j]->sel,taskctl->tasks[j]->freq);
 							putfonts8_asc_sht(sht_back, 400, j*16, COL8_FFFFFF, COL8_008484, s, 42);
-						}
+						}*/
 			} else if (512 <= i && i <= 767) {
 				if (mouse_decode(&mdec, i - 512) != 0) {
 					sprintf(s, "[lcr %4d %4d]", mdec.x, mdec.y);
