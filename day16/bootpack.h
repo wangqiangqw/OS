@@ -229,7 +229,8 @@ struct TSS32
 
 struct TASK
 {
-	int sel, flags;
+	int sel, flags, freq;
+	int priority;
 	struct TSS32 tss;
 };
 

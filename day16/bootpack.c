@@ -4,8 +4,8 @@
 
 
 extern struct TIMERCTL timerctl;
+extern struct TASKCTL *taskctl;
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
-
 void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 
 void HariMain(void)
@@ -136,6 +136,12 @@ void HariMain(void)
 				}
 				boxfill8(sht_win->buf, sht_win->bxsize, cursor_c, cursor_x, 28, cursor_x + 7, 43);
 				sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
+						int j;
+						for(j=0;j<taskctl->running;j++)
+						{
+							sprintf(s, "Task: %d, Freq: %d",taskctl->tasks[j]->sel,taskctl->tasks[j]->freq);
+							putfonts8_asc_sht(sht_back, 400, j*16, COL8_FFFFFF, COL8_008484, s, 42);
+						}
 			} else if (512 <= i && i <= 767) {
 				if (mouse_decode(&mdec, i - 512) != 0) {
 					sprintf(s, "[lcr %4d %4d]", mdec.x, mdec.y);
